@@ -30,7 +30,7 @@ def job():
         price_fraction = price_element_fraction.get_text(strip=True)
         price = price_whole + price_fraction
         price_float = float(price)
-        target_price = 29.99
+        target_price = 20.00
         if price_float > target_price:
             print(price_float)
             send_email(price_float)
