@@ -5,6 +5,9 @@ import requests
 from bs4 import BeautifulSoup
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+from flask import Flask
+
+app = Flask(__name__)
 
 ASIN = "B001HBIPE4"
 URL = f"https://www.amazon.com/dp/{ASIN}/"
@@ -62,7 +65,8 @@ def send_email(price):
         print(e.message)
     
 
-if __name__ == "__main__":
+@app.route("/")
+def watch_price():
     schedule.every(1).minutes.do(job)
     while True:
         schedule.run_pending()
