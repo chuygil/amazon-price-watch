@@ -6,8 +6,7 @@ from bs4 import BeautifulSoup
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
-ASIN = "B001HBIPE4"
-URL = f"https://www.amazon.com/dp/{ASIN}/"
+ASINS = ["B001HBIPE4", "B0C9R5SJSF", "B0C9R5NNRB", "B0C9R5VGY7"]
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
     "Accept-Encoding": "gzip, deflate",
@@ -18,44 +17,59 @@ HEADERS = {
 }
 
 def job():
-    session = requests.Session()
-    r = session.get(URL, headers=HEADERS)
+    for asin in ASINS:
+        url = f"https://www.amazon.com/dp/{asin}/"
+        session = requests.Session()
+        r = session.get(url, headers=HEADERS)
 
-    soup = BeautifulSoup(r.content, "html5lib")
-    price_element_whole = soup.find("span", class_="a-price-whole")
-    price_element_fraction = soup.find("span", class_="a-price-fraction")
+        soup = BeautifulSoup(r.content, "html5lib")
+        price_element_whole = soup.find("span", class_="a-price-whole")
+        price_element_fraction = soup.find("span", class_="a-price-fraction")
 
-    if price_element_whole and price_element_fraction:
-        price_whole = price_element_whole.get_text(strip=True)
-        price_fraction = price_element_fraction.get_text(strip=True)
-        price = price_whole + price_fraction
-        price_float = float(price)
-        target_price = 20.00
-        if price_float > target_price:
-            print(price_float)
-            send_email(price_float)
+        if price_element_whole and price_element_fraction:
+            price_whole = price_element_whole.get_text(strip=True)
+            price_fraction = price_element_fraction.get_text(strip=True)
+            price = price_whole + price_fraction
+            price_float = float(price)
+
+            match asin:
+                case "B001HBIPE4":
+                    print(f"{asin},{price_float}")
+                    if price_float > 29.99:
+                        send_email(asin, price_float)
+                case "B0C9R5SJSF":
+                    print(f"{asin},{price_float}")
+                    if price_float > 1.49:
+                        send_email(asin, price_float)
+                case "B0C9R5NNRB":
+                    print(f"{asin},{price_float}")
+                    if price_float > 1.99:
+                        send_email(asin, price_float)
+                case "B0C9R5VGY7":
+                    print(f"{asin},{price_float}")
+                    if price_float > 4.99:
+                        send_email(asin, price_float)
         else:
-            print(price_float)
-    else:
-        print("Price Not Found")
+            print(f"{asin},Price Not Found")
     
 
-def send_email(price):
+def send_email(asin, price):
     to_emails = [
-        (os.environ.get('TO_EMAIL_ONE'), 'JG 1'),
-        (os.environ.get('TO_EMAIL_TWO'), 'JG 2')
+        (os.environ.get('TO_EMAIL_ONE'), os.environ.get('EMAIL_ONE_NAME')),
+        (os.environ.get('TO_EMAIL_TWO'), os.environ.get('EMAIL_TWO_NAME')),
+        (os.environ.get('ADMIN_EMAIL'), os.environ.get('ADMIN_NAME'))
     ]
 
     message = Mail(
-        from_email = os.environ.get('FROM_EMAIL'),
+        from_email = os.environ.get('ADMIN_EMAIL'),
         to_emails = to_emails,
-        subject=f'Amazon Price Alert - ASIN: {ASIN}',
-        html_content=f'<p>ASIN: {ASIN}</p><p>Price: ${price}</p>')
+        subject=f'Amazon Price Alert - ASIN: {asin}',
+        html_content=f'<p>ASIN: {asin}</p><p>Price: ${price}</p>')
 
     try:
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
-        print(response.status_code)
+        print(f"Email sent. {asin},{price} - Status Code: {response.status_code}")
         # print(response.body)
         # print(response.headers)
     except Exception as e:
