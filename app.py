@@ -9,6 +9,7 @@ from sendgrid.helpers.mail import Mail
 ASINS = ["B001HBIPE4", "B0C9R5SJSF", "B0C9R5NNRB", "B0C9R5VGY7"]
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+    # "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
     "Accept-Encoding": "gzip, deflate",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "DNT": "1",
@@ -83,7 +84,7 @@ def send_email(asin, price):
 if __name__ == "__main__":
     job()
 
-# schedule.every(1).minutes.do(job)
+# schedule.every(10).minutes.do(job)
 # while True:
 #     schedule.run_pending()
 #     time.sleep(1)
