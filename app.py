@@ -35,25 +35,13 @@ def job():
 
             match asin:
                 case "B001HBIPE4":
-                    if price_float > 29.99:
-                        send_email(asin, price_float)
-                    else:
-                        print(f"{asin},${price_float}")
+                    send_email(asin, price_float) if price_float > 29.99 else print(f"{asin},${price_float}")
                 case "B0C9R5SJSF":
-                    if price_float > 1.49:
-                        send_email(asin, price_float)
-                    else:
-                        print(f"{asin},${price_float}")
+                    send_email(asin, price_float) if price_float > 1.49 else print(f"{asin},${price_float}")
                 case "B0C9R5NNRB":
-                    if price_float > 1.99:
-                        send_email(asin, price_float)
-                    else:
-                        print(f"{asin},${price_float}")
+                    send_email(asin, price_float) if price_float > 1.99 else print(f"{asin},${price_float}")
                 case "B0C9R5VGY7":
-                    if price_float > 4.99:
-                        send_email(asin, price_float)
-                    else:
-                        print(f"{asin},${price_float}")
+                    send_email(asin, price_float) if price_float > 4.99 else print(f"{asin},${price_float}")
                 case _:
                     print("Something went wrong.")
         else:
@@ -62,9 +50,9 @@ def job():
 
 def send_email(asin, price):
     to_emails = [
-        # (os.environ.get('TO_EMAIL_ONE'), os.environ.get('EMAIL_ONE_NAME')),
-        # (os.environ.get('TO_EMAIL_TWO'), os.environ.get('EMAIL_TWO_NAME')),
-        (os.environ.get('ADMIN_EMAIL'), os.environ.get('ADMIN_NAME'))
+        (os.environ.get('ADMIN_EMAIL'), os.environ.get('ADMIN_NAME')),
+        (os.environ.get('TO_EMAIL_ONE'), os.environ.get('EMAIL_ONE_NAME')),
+        (os.environ.get('TO_EMAIL_TWO'), os.environ.get('EMAIL_TWO_NAME'))
     ]
 
     message = Mail(
@@ -78,7 +66,7 @@ def send_email(asin, price):
         response = sg.send(message)
         print(f">>> Email sent: {asin}/${price} - Status Code: {response.status_code}")
     except Exception as e:
-        print(e.message)
+        print(e)
     
 
 if __name__ == "__main__":
